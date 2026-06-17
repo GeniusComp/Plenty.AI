@@ -1,7 +1,10 @@
 import os
 import requests
 from dotenv import load_dotenv
-
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from src.data.database import save_prices
 # Load environment variables from .env file
 load_dotenv()
 
@@ -52,7 +55,7 @@ def search_walmart_products(query: str, limit: int = 5) -> list:
             "name": item.get("name", "Unknown"),
             "price": item.get("priceInfo", {}).get("linePrice") or item.get("price", "N/A"),
             "unit_price": item.get("priceInfo", {}).get("unitPrice", "N/A"),
-            "available": item.get("availabilityStatus", "Unknown")
+            "available": item.get("availabilityStatusDisplayValue", "Unknown")
         }
         products.append(product)
     
@@ -76,6 +79,8 @@ def main():
         print("-" * 30)
         
         products = search_walmart_products(item, limit=3)
+        if products:
+            save_prices(products, item)
         
         if not products:
             print("No results found")
@@ -94,3 +99,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+  
+ 
+
